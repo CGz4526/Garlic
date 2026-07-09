@@ -1,0 +1,50 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IntelliJ IDEA
+*.iml
+.idea/
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# VS Code
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Properties / Secrets
+*.local
+*.local.yml
+# 本地凭证覆盖文件（如 application-local.yml 自带真实密码）
+application-local.yml
+application-local.properties
+
+# JVM dump / GC 日志
+*.hprof
+gc.log.*
+heapdump.*
+
+# TRAE 规格文件（本地开发产物，不随仓库分发）
+.trae/
+
+# 截图临时文件
+docs/screenshots/*.tmp

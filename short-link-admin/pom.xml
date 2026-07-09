@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.garlic</groupId>
+        <artifactId>short-link</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>short-link-admin</artifactId>
+    <name>short-link-admin</name>
+    <description>后台管理模块：管理端业务</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.garlic</groupId>
+            <artifactId>short-link-service</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -1,0 +1,99 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: short-link-service
+  # 同时激活 dev 与 sharding profile（sharding 加载 application-sharding.yml 分库分表配置）
+  profiles:
+    active: dev,sharding
+
+  # ==================== Redis 配置 ====================
+  # Redisson 由 redisson-spring-boot-starter 自动配置
+  # 密码通过环境变量注入，避免提交真实凭证：export REDIS_PASSWORD=xxx
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    password: ${REDIS_PASSWORD:}
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 16
+        max-idle: 8
+        min-idle: 2
+        max-wait: 3000ms
+
+  # ==================== Kafka 配置 ====================
+  # 生产者参数由 KafkaConfig 显式定义 ProducerFactory（acks=all/retries=3/batch.size=16384/linger.ms=10）
+  # 此处配置供 spring-kafka 自动配置消费者
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: short-link-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+  # ==================== Sentinel Dashboard 配置（可选） ====================
+  # 当前项目使用 sentinel-core + sentinel-annotation-aspectj（非 Spring Cloud Starter），
+  # 以下 spring.cloud.sentinel.* 配置需要引入 spring-cloud-starter-alibaba-sentinel 才会生效。
+  # 如需接入 Sentinel Dashboard 进行可视化管理，请按以下步骤操作：
+  #   1. 在 short-link-common/pom.xml 中添加依赖：
+  #      <dependency>
+  #          <groupId>com.alibaba.cloud</groupId>
+  #          <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+  #      </dependency>
+  #   2. 启动 Sentinel Dashboard（默认端口 8858）：
+  #      java -Dserver.port=8858 -Dcsp.sentinel.dashboard.server=localhost:8858 \
+  #           -jar sentinel-dashboard-1.8.6.jar
+  #   3. 取消下方注释，重启服务后 Dashboard 即可自动发现客户端。
+  #   4. SentinelRulePersistence 中也需取消 csp.sentinel.dashboard.server 系统属性注释。
+  #  cloud:
+  #    sentinel:
+  #      transport:
+  #        dashboard: localhost:8858
+  #        # 客户端与 Dashboard 通信端口（默认 8719，被占用时自动+1）
+  #        port: 8719
+  #      # eager: true 表示应用启动即与 Dashboard 建立连接（默认懒加载）
+  #      eager: true
+
+# ==================== MyBatis-Plus 配置 ====================
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+# ==================== Actuator + Micrometer 监控 ====================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,threaddump,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    health:
+      show-details: always
+
+# ==================== 雪花算法配置 ====================
+snowflake:
+  # 工作节点 ID（0 ~ 31）
+  worker-id: 1
+  # 数据中心 ID（0 ~ 31）
+  datacenter-id: 1
+
+# ==================== 日志配置 ====================
+logging:
+  level:
+    root: INFO
+    com.garlic.shortlink: DEBUG
+    org.springframework: WARN
+    org.mybatis: WARN

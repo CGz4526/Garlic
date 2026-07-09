@@ -1,0 +1,130 @@
+# ====================================================================
+# ShardingSphere-JDBC 5.2.1 分库分表配置（profile: sharding）
+# --------------------------------------------------------------------
+# 通过 spring.profiles.active=dev,sharding 激活本文件。
+# ShardingSphere 提供 DataSource，MyBatis-Plus 使用该 DataSource 进行 CRUD。
+# ====================================================================
+spring:
+  shardingsphere:
+    # -------------------- 数据源配置（4 个库 link_db_0~3）--------------------
+    # 用户名/密码为占位值，可按环境修改
+    datasource:
+      names: ds_0,ds_1,ds_2,ds_3
+      ds_0:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/link_db_0?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+        username: ${MYSQL_USERNAME:root}
+        password: ${MYSQL_PASSWORD:}
+      ds_1:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/link_db_1?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+        username: ${MYSQL_USERNAME:root}
+        password: ${MYSQL_PASSWORD:}
+      ds_2:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/link_db_2?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+        username: ${MYSQL_USERNAME:root}
+        password: ${MYSQL_PASSWORD:}
+      ds_3:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/link_db_3?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+        username: ${MYSQL_USERNAME:root}
+        password: ${MYSQL_PASSWORD:}
+
+    # -------------------- 分片规则 --------------------
+    rules:
+      sharding:
+        # ==== 分片表配置 ====
+        tables:
+          # 1. t_short_link：按 short_code 哈希分库分表
+          #    每库 4 张分表，4 库共 16 张物理表
+          t_short_link:
+            actual-data-nodes: ds_$->{0..3}.t_short_link_$->{0..3}
+            database-strategy:
+              standard:
+                sharding-column: short_code
+                sharding-algorithm-name: short_link_db_inline
+            table-strategy:
+              standard:
+                sharding-column: short_code
+                sharding-algorithm-name: short_link_table_inline
+            key-generate-strategy:
+              column: id
+              key-generator-name: snowflake
+
+          # 2. t_link_access_record：按 access_time 月份分表，不分库（仅落 ds_0）
+          t_link_access_record:
+            actual-data-nodes: ds_0.t_link_access_record_$->{202601..202612}
+            table-strategy:
+              standard:
+                sharding-column: access_time
+                sharding-algorithm-name: access_record_interval
+            key-generate-strategy:
+              column: id
+              key-generator-name: snowflake
+
+          # 3. t_link_access_stats：按 short_code 哈希分库分表
+          t_link_access_stats:
+            actual-data-nodes: ds_$->{0..3}.t_link_access_stats_$->{0..3}
+            database-strategy:
+              standard:
+                sharding-column: short_code
+                sharding-algorithm-name: short_link_db_inline
+            table-strategy:
+              standard:
+                sharding-column: short_code
+                sharding-algorithm-name: access_stats_table_inline
+            key-generate-strategy:
+              column: id
+              key-generator-name: snowflake
+
+        # ==== 绑定表：t_short_link 与 t_link_access_stats 分片键相同，避免笛卡尔积 ====
+        binding-tables:
+          - t_short_link,t_link_access_stats
+
+        # ==== 广播表：t_user、t_group 每个库结构与数据完全一致 ====
+        broadcast-tables:
+          - t_user
+          - t_group
+
+        # ==== 分片算法 ====
+        sharding-algorithms:
+          # t_short_link / t_link_access_stats 分库：short_code 哈希取模 4
+          short_link_db_inline:
+            type: INLINE
+            props:
+              algorithm-expression: ds_${short_code.hashCode().abs() % 4}
+          # t_short_link 分表：short_code 哈希取模 4
+          short_link_table_inline:
+            type: INLINE
+            props:
+              algorithm-expression: t_short_link_${short_code.hashCode().abs() % 4}
+          # t_link_access_stats 分表：short_code 哈希取模 4
+          access_stats_table_inline:
+            type: INLINE
+            props:
+              algorithm-expression: t_link_access_stats_${short_code.hashCode().abs() % 4}
+          # t_link_access_record 分表：按 access_time 月份路由（INTERVAL）
+          access_record_interval:
+            type: INTERVAL
+            props:
+              datetime-pattern: yyyy-MM-dd HH:mm:ss
+              datetime-lower: 2026-01-01 00:00:00
+              datetime-upper: 2026-12-31 23:59:59
+              sharding-suffix-pattern: yyyyMM
+              datetime-interval-amount: 1
+              datetime-interval-unit: MONTHS
+
+        # ==== 主键生成策略 ====
+        key-generators:
+          snowflake:
+            type: SNOWFLAKE
+
+    # -------------------- ShardingSphere 属性 --------------------
+    props:
+      # 开发期打印实际路由 SQL，方便验证分片结果
+      sql-show: true

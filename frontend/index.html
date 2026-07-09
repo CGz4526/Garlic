@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garlic · Short Link Console</title>
+    <meta name="description" content="Garlic 短链接服务控制台 — 创建、管理与分析你的短链">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="nav-bar">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                        <path d="M12 2c-1.5 2-3 3.5-3 6a3 3 0 0 0 6 0c0-2.5-1.5-4-3-6Z"/>
+                        <path d="M12 11v11"/>
+                        <path d="M9 17l3 2 3-2"/>
+                    </svg>
+                </span>
+                <div class="brand-text">
+                    <span class="brand-name">Garlic</span>
+                    <span class="brand-sub">Short Link</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu" id="navMenu">
+                <button class="nav-item active" data-view="dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                    <span>仪表盘</span>
+                </button>
+                <button class="nav-item" data-view="manage">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <span>短链管理</span>
+                </button>
+                <button class="nav-item" data-view="stats">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                    <span>统计分析</span>
+                </button>
+                <button class="nav-item" data-view="batch">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7"/><path d="M17.5 14v7"/></svg>
+                    <span>批量生成</span>
+                </button>
+            </nav>
+
+            <div class="nav-actions">
+                <button class="icon-btn" id="apiModeBtn" title="切换 Mock / 真实 API" aria-label="API 模式">
+                    <span class="api-badge" id="apiBadge">MOCK</span>
+                </button>
+                <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题">
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                </button>
+                <a class="icon-btn" href="https://github.com" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-wrap">
+        <!-- ============ 仪表盘视图 ============ -->
+        <section class="view active" id="view-dashboard">
+            <div class="view-head">
+                <div>
+                    <h1 class="view-title">仪表盘</h1>
+                    <p class="view-desc">短链服务的整体运行概览</p>
+                </div>
+                <span class="live-tag">
+                    <span class="live-dot"></span>实时
+                </span>
+            </div>
+
+            <!-- 4 个数据卡片 -->
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    </div>
+                    <span class="stat-label">总短链数</span>
+                    <span class="stat-value" data-stat="total">0</span>
+                    <span class="stat-trend up">+12.4% 本周</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                    </div>
+                    <span class="stat-label">今日 PV</span>
+                    <span class="stat-value" data-stat="pv">0</span>
+                    <span class="stat-trend up">+8.1% 昨日</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <span class="stat-label">今日 UV</span>
+                    <span class="stat-value" data-stat="uv">0</span>
+                    <span class="stat-trend up">+5.7% 昨日</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <span class="stat-label">缓存命中率</span>
+                    <span class="stat-value"><span data-stat="hit">0</span><span class="stat-unit">%</span></span>
+                    <span class="stat-trend flat">稳定</span>
+                </div>
+            </div>
+
+            <!-- 7 天 PV 趋势 -->
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">最近 7 天 PV 趋势</h2>
+                    <div class="panel-tabs">
+                        <button class="seg-btn active" data-trend="7">7 天</button>
+                        <button class="seg-btn" data-trend="14">14 天</button>
+                    </div>
+                </div>
+                <div class="chart-box"><canvas id="dashTrendChart"></canvas></div>
+            </div>
+
+            <!-- 热门短链 TOP 5 -->
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">热门短链 TOP 5</h2>
+                    <a class="link-text" data-view="manage">查看全部</a>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th style="width:120px">短码</th><th>原始链接</th><th style="width:120px">PV</th><th style="width:110px">状态</th></tr>
+                        </thead>
+                        <tbody id="topLinksBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ 短链管理视图 ============ -->
+        <section class="view" id="view-manage">
+            <div class="view-head">
+                <div>
+                    <h1 class="view-title">短链管理</h1>
+                    <p class="view-desc">创建、编辑与删除你的短链</p>
+                </div>
+            </div>
+
+            <!-- 创建表单 -->
+            <div class="panel form-panel">
+                <div class="form-stripe" aria-hidden="true"></div>
+                <div class="panel-head"><h2 class="panel-title">创建短链</h2></div>
+                <form class="create-form" id="createForm" autocomplete="off">
+                    <div class="field full">
+                        <label for="fUrl">原始长链</label>
+                        <div class="input-affix">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            <input type="url" id="fUrl" name="originalUrl" placeholder="https://example.com/very/long/url" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="fDesc">描述</label>
+                        <input type="text" id="fDesc" name="describe" placeholder="给这条短链起个备注">
+                    </div>
+                    <div class="field">
+                        <label for="fExpire">过期时间</label>
+                        <input type="text" id="fExpire" name="expireTime" placeholder="2026-12-31 23:59:59">
+                    </div>
+                    <div class="field actions">
+                        <button type="submit" class="btn-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            生成短链
+                        </button>
+                    </div>
+                </form>
+                <div class="form-result" id="formResult" hidden>
+                    <span class="result-tag">新短链</span>
+                    <code id="newShortUrl"></code>
+                    <button class="icon-btn sm" id="copyNewBtn" title="复制">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 列表 -->
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">短链列表</h2>
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" id="listSearch" placeholder="搜索短码或链接…">
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:110px">短码</th>
+                                <th style="width:200px">短链</th>
+                                <th>原始链接</th>
+                                <th style="width:90px">PV</th>
+                                <th style="width:90px">状态</th>
+                                <th style="width:150px">创建时间</th>
+                                <th style="width:100px">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="linksBody"></tbody>
+                    </table>
+                </div>
+                <div class="pager">
+                    <span class="pager-info" id="pagerInfo"></span>
+                    <div class="pager-controls">
+                        <button class="icon-btn sm" id="prevPage" title="上一页">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <span class="pager-cur" id="pagerCur">1</span>
+                        <button class="icon-btn sm" id="nextPage" title="下一页">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ 统计分析视图 ============ -->
+        <section class="view" id="view-stats">
+            <div class="view-head">
+                <div>
+                    <h1 class="view-title">统计分析</h1>
+                    <p class="view-desc">深入分析单条短链的访问数据</p>
+                </div>
+            </div>
+
+            <!-- 短码选择器 -->
+            <div class="panel">
+                <div class="panel-head"><h2 class="panel-title">选择短链</h2></div>
+                <div class="selector-row">
+                    <div class="input-affix grow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <select id="statsSelect" class="select-field"></select>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" class="chev"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 个统计卡片 -->
+            <div class="stat-grid three">
+                <div class="stat-card">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
+                    <span class="stat-label">总 PV</span>
+                    <span class="stat-value" id="ovPv">0</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                    <span class="stat-label">总 UV</span>
+                    <span class="stat-value" id="ovUv">0</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                    <span class="stat-label">独立 IP</span>
+                    <span class="stat-value" id="ovIp">0</span>
+                </div>
+            </div>
+
+            <!-- 访问趋势 -->
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">访问趋势</h2>
+                    <div class="panel-tabs">
+                        <button class="seg-btn active" data-stats-trend="7">7 天</button>
+                        <button class="seg-btn" data-stats-trend="30">30 天</button>
+                    </div>
+                </div>
+                <div class="chart-box"><canvas id="statsTrendChart"></canvas></div>
+            </div>
+
+            <!-- 维度分布 -->
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">维度分布</h2>
+                    <div class="panel-tabs" id="distTabs">
+                        <button class="seg-btn active" data-dim="browser">浏览器</button>
+                        <button class="seg-btn" data-dim="os">操作系统</button>
+                        <button class="seg-btn" data-dim="device">设备</button>
+                        <button class="seg-btn" data-dim="region">地域</button>
+                    </div>
+                </div>
+                <div class="chart-box donut-box"><canvas id="distChart"></canvas></div>
+            </div>
+
+            <!-- 24 小时分布 -->
+            <div class="panel">
+                <div class="panel-head"><h2 class="panel-title">24 小时访问分布</h2></div>
+                <div class="chart-box"><canvas id="hourChart"></canvas></div>
+            </div>
+        </section>
+
+        <!-- ============ 批量生成视图 ============ -->
+        <section class="view" id="view-batch">
+            <div class="view-head">
+                <div>
+                    <h1 class="view-title">批量生成</h1>
+                    <p class="view-desc">一次性为多个长链生成短链</p>
+                </div>
+            </div>
+
+            <div class="panel form-panel">
+                <div class="form-stripe" aria-hidden="true"></div>
+                <div class="panel-head">
+                    <h2 class="panel-title">输入链接</h2>
+                    <span class="muted-text">每行一个 URL</span>
+                </div>
+                <textarea id="batchInput" class="batch-area" rows="9" placeholder="https://github.com/garlic/short-link&#10;https://stackoverflow.com/questions/123&#10;https://docs.spring.io/spring-boot/docs/current/reference/html"></textarea>
+                <div class="batch-actions">
+                    <button class="btn-primary" id="batchBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        批量生成
+                    </button>
+                    <button class="btn-ghost" id="batchClear">清空</button>
+                    <span class="muted-text" id="batchCount">0 条</span>
+                </div>
+            </div>
+
+            <div class="panel" id="batchResultPanel" hidden>
+                <div class="panel-head">
+                    <h2 class="panel-title">生成结果</h2>
+                    <button class="btn-ghost sm" id="copyAllBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        一键复制全部
+                    </button>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>原始链接</th><th style="width:200px">短链</th><th style="width:90px">操作</th></tr></thead>
+                        <tbody id="batchBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast" hidden></div>
+
+    <!-- 编辑弹窗 -->
+    <div class="modal-mask" id="editModal" hidden>
+        <div class="modal">
+            <div class="modal-head">
+                <h3 class="modal-title">编辑短链</h3>
+                <button class="icon-btn sm" id="editClose" title="关闭">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <form id="editForm" class="modal-body">
+                <input type="hidden" id="eCode">
+                <div class="field">
+                    <label for="eDesc">描述</label>
+                    <input type="text" id="eDesc">
+                </div>
+                <div class="field">
+                    <label for="eExpire">过期时间</label>
+                    <input type="text" id="eExpire" placeholder="2026-12-31 23:59:59">
+                </div>
+                <div class="modal-foot">
+                    <button type="button" class="btn-ghost" id="editCancel">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="短链接跳转压测计划" enabled="true">
+      <stringProp name="TestPlan.comments">短链接服务跳转接口压测：500 并发，Ramp-Up 10s，循环 100 次</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="用户定义变量" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="HOST" elementType="Argument">
+            <stringProp name="Argument.name">HOST</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PORT" elementType="Argument">
+            <stringProp name="Argument.name">PORT</stringProp>
+            <stringProp name="Argument.value">8001</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PROTOCOL" elementType="Argument">
+            <stringProp name="Argument.name">PROTOCOL</stringProp>
+            <stringProp name="Argument.value">http</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP 请求默认值" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="用户定义变量" enabled="true">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+        <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+        <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
+        <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+        <stringProp name="HTTPSampler.path"></stringProp>
+        <stringProp name="HTTPSampler.concurrentPool">6</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout">5000</stringProp>
+        <stringProp name="HTTPSampler.response_timeout">10000</stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="跳转接口压测线程组" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">100</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">500</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">10</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="随机短码生成器" enabled="true">
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="script">// 预置 100 个短码（命名规则：bm + 三位数字，如 bm000~bm099）
+// 实际压测前请通过批量生成接口预置 100 个真实短码，并替换下方数组
+def codes = []
+for (int i = 0; i &lt; 100; i++) {
+    codes.add(String.format(&quot;bm%03d&quot;, i))
+}
+// 从 100 个预置短码中随机选取一个
+def randomCode = codes.get(new Random().nextInt(codes.size()))
+// 设置到 JMeter 变量供 HTTP 请求使用
+vars.put(&quot;shortCode&quot;, randomCode)</stringProp>
+        </JSR223PreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET 跳转接口" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="用户定义变量" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <stringProp name="HTTPSampler.path">/${shortCode}</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout">5000</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">10000</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="响应码断言（302/200）" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49574">302</stringProp>
+              <stringProp name="200">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message">跳转接口响应码非 302/200</stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">34</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="聚合报告" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp name="ResultCollector.save_config" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="包括响应字段" elementType="Argument">
+                <stringProp name="Argument.name">包括响应字段</stringProp>
+                <boolProp name="Argument.value">false</boolProp>
+              </elementProp>
+              <elementProp name="包括响应代码" elementType="Argument">
+                <stringProp name="Argument.name">包括响应代码</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+              <elementProp name="包括响应信息" elementType="Argument">
+                <stringProp name="Argument.name">包括响应信息</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+              <elementProp name="包括响应头信息" elementType="Argument">
+                <stringProp name="Argument.name">包括响应头信息</stringProp>
+                <boolProp name="Argument.value">false</boolProp>
+              </elementProp>
+              <elementProp name="包括请求头信息" elementType="Argument">
+                <stringProp name="Argument.name">包括请求头信息</stringProp>
+                <boolProp name="Argument.value">false</boolProp>
+              </elementProp>
+              <elementProp name="Elapsed Time" elementType="Argument">
+                <stringProp name="Argument.name">Elapsed Time</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+              <elementProp name="Latency" elementType="Argument">
+                <stringProp name="Argument.name">Latency</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="查看结果树" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp name="ResultCollector.save_config" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="包括响应字段" elementType="Argument">
+                <stringProp name="Argument.name">包括响应字段</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+              <elementProp name="包括响应代码" elementType="Argument">
+                <stringProp name="Argument.name">包括响应代码</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+              <elementProp name="包括响应信息" elementType="Argument">
+                <stringProp name="Argument.name">包括响应信息</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+              <elementProp name="包括响应头信息" elementType="Argument">
+                <stringProp name="Argument.name">包括响应头信息</stringProp>
+                <boolProp name="Argument.value">false</boolProp>
+              </elementProp>
+              <elementProp name="包括请求头信息" elementType="Argument">
+                <stringProp name="Argument.name">包括请求头信息</stringProp>
+                <boolProp name="Argument.value">false</boolProp>
+              </elementProp>
+              <elementProp name="Elapsed Time" elementType="Argument">
+                <stringProp name="Argument.name">Elapsed Time</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+              <elementProp name="Latency" elementType="Argument">
+                <stringProp name="Argument.name">Latency</stringProp>
+                <boolProp name="Argument.value">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
