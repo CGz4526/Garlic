@@ -284,6 +284,7 @@ Garlic/
 - [运行指南与系统测试样例](docs/RUNNING_GUIDE.md)
 - [简历描述（精简版）](docs/RESUME.md)
 - [项目学习笔记](docs/STUDY_NOTES.md)
+- [从业务场景理解技术用途](docs/SCENARIO_GUIDE.md)
 
 ## License
 
